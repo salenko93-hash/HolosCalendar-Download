@@ -1,0 +1,36 @@
+{
+  "version": "4.4.0",
+  "versionCode": 15,
+  "applicationId": "ua.holoscalendar.redmi",
+  "public_source_commit": "a08cc26047c0edbd47652ea97071d5fd15059e48",
+  "public_source_tree": "dd50539062b0d0727c7ccd29466ae4ceff196cfd",
+  "replaces_version": "4.3.0",
+  "ukrainian_phrase_examples": 122,
+  "speech_models": false,
+  "speech_recognition": false,
+  "native_libraries": false,
+  "apk_sha256": "3fda895f4721934a2225af568457f50693d76e3573895c79d6deedd88ac25f1b",
+  "pdf_sha256": "8dadf83d3fdbfb7ab7eb4e5c7e1531f37a03a580f256f3aade1108dba111a333",
+  "signing_certificate_sha256": "78b4c9d5608ebfc512c2ef79acaa19a57f9e72c979e74e4120ce4015a06585ab",
+  "android_api26_tests": {
+    "tests": 64,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "jvm_tests": {
+    "tests": 223,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint_issues": 0,
+  "minimum_sdk": 26,
+  "target_sdk": 35,
+  "architecture": "pure Java; no ABI restriction",
+  "limitations": [
+    "Physical Redmi notification, Doze, MIUI/HyperOS behavior not verified.",
+    "API35 runtime tests not locally executed for 4.4.0.",
+    "User-downloaded .bin files in shared Downloads require manual deletion."
+  ]
+}
