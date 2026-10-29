@@ -1,34 +1,38 @@
 # HolosCalendar-Download
 
-Готовий **ГолосКалендар 4.0.0** для Android 8.0+ та повний проєкт Android Studio.
+**ГолосКалендар 4.1.0 — локальний український голос.** Android 8+, 64-бітний arm64/x86_64.
 
 ## Завантажити на ПК
 
-### [⬇ Повний проєкт ZIP — APK та PDF всередині](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.0.0-project.zip)
+### [⬇ Повний проєкт ZIP — APK та PDF всередині](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.1.0-project.zip)
 
-Натисніть посилання й збережіть ZIP у «Завантаження». Розпакуйте його, потім відкрийте папку **HolosCalendar** в Android Studio. Потрібні JDK 17 і Android SDK 35. Усі вихідні файли, Gradle Wrapper, документація й тести включені.
+Розпакуйте архів і відкрийте папку HolosCalendar в Android Studio. Потрібні JDK 17, SDK 35, NDK 27.2.12479018, CMake 3.22.1. C++-джерела Whisper включені; ваги завантажуються окремо.
 
-## Окремі файли
+- [APK 4.1.0 для телефона](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.1.0-debug.apk)
+- [PDF: встановлення локального голосу й 87 українських фраз](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-Ukrainian-4.1.0.pdf)
+- [Скрипт завантаження моделі на Windows](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/DOWNLOAD_MODEL.ps1)
+- [Контрольні суми SHA-256 4.1.0](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/SHA256SUMS-4.1.0.txt)
+- [Звіт Android API26](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/Android-API26-4.1.0.xml)
+- [Вихідний код 4.1.0](https://github.com/salenko93-hash/HolosCalendar-Download/tree/source-4.1.0), commit `910d37c9f4d03a12f3d98fcf90decf382e61ed15`.
 
-- [APK для телефона — HolosCalendar 4.0.0](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.0.0-debug.apk)
-- [PDF — 87 українських фраз та правила уточнення](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-Ukrainian-4.0.0.pdf)
-- [Контрольні суми SHA-256](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/SHA256SUMS.txt)
-- [Звіт 50 Android-тестів на API 26](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/Android-API26.xml)
+## Як увімкнути власне локальне розпізнавання
 
-ZIP містить інсталятор у `HolosCalendar/APK/` і PDF у `HolosCalendar/Docs/`.
+1. Відкрийте голос у формі події → «Завантажити модель у браузері». Виберіть багатомовну Tiny (близько 75 МіБ) або Base (близько 142 МіБ). Можна завантажити на ПК скриптом із ZIP і перенести файл на телефон.
+2. Натисніть «Вибрати файл моделі», дочекайтеся перевірки й дозвольте мікрофон.
+3. «Почати запис» → одна команда українською → «Завершити запис». Перевірте текст і поля перед збереженням. Межа запису — 30 секунд.
 
-## Що оновлено
+Після імпорту цей режим працює без інтернету й без Google. Аудіо перебуває тільки в RAM, не зберігається в аудіофайл і не надсилається на сервер. Системний сервіс доступний як інший явний режим. Це готова Whisper; власного донавчання ваг ще немає. Якість на різних голосах і швидкість Redmi треба перевірити.
 
-Природні українські формулювання часу, дат і тривалості; часові проміжки; повторення; цілоденні події та нагадування. «За пів години» задає початок через 30 хвилин; «на пів години» — тривалість. Якщо тривалість не названо, поле залишається порожнім. Неоднозначні фрази потребують уточнення. Зміна та видалення стосуються всієї серії.
+## Оновлення та дані
 
-## Установлення APK
+VersionCode 11. Підпис хмарних APK збережений. Якщо поточну 4.0.0 ви зібрали й установили зі свого ПК, зберіть нову з ZIP на тому самому ПК з тим самим debug-ключем. Не видаляйте застосунок для звичайного оновлення: події зберігаються тільки локально. Схема календаря у 4.1.0 не змінюється.
 
-Це debug-збірка, versionCode 10. Підпис збережений від хмарної 3.2.0: установлюйте поверх неї без видалення застосунку. Оновлення зі збереженням старої події та нагадування перевірене. Для APK, зібраного іншим ключем на вашому ПК, потрібен той самий ключ підпису.
+Тривалість без вказівки залишається порожньою; неоднозначні фрази уточнюються. Зміна/видалення стосується всієї серії. Автоматичної синхронізації з зовнішнім календарем немає.
 
-Події зберігаються локально. Видалення застосунку стирає їх. Автоматичної синхронізації із зовнішнім календарем немає. Голос розпізнає системний сервіс Android українською; текстове введення та власний календар працюють без мережі.
+## Перевірено
 
-## Перевірки
+190 JVM-тестів та 56 Android-тестів на API26. Справжня Base та український WAV, таймаут і конкурентне скасування/закриття перевірені через той самий JNI-код на Linux-хості. Повну модельну транскрипцію на повільному програмному AVD зупинено через тривалий час; це не успішний модельний тест Android. Відмова для некоректного імпорту, завантаження JNI, повернення тексту, скасування та попередні функції календаря перевірені; lint без зауважень. Підпис APK v2 й вирівнювання native ELF/ZIP 16 КіБ перевірені. API35 CI налаштовано, результат тут не підтверджено. Реальний мікрофон, дозволи нових Android і якість на Redmi потребують перевірки на телефоні. Деталі в TESTING.md та docs/OFFLINE_SPEECH.md усередині ZIP.
 
-**182 JVM-тести, 50 Android-тестів на API 26, без помилок і пропусків; lint без зауважень.** Підпис APK v2 і zipalign перевірені. Окремо перевірене встановлення 4.0.0 поверх 3.2.0 зі збереженням даних. API 35 налаштовано в CI вихідного проєкту, його результат у цій перевірці не підтверджений. Google-розпізнавач, звук та налаштування Redmi додатково перевіряються на телефоні за TESTING.md у ZIP.
+## Попередня 4.0.0
 
-Вихідний Git commit збірки: `3e12c3cdb861a051b0b6484f51dbe6db6d112313`. Файли APK, ZIP і PDF перенесено без зміни байтів; контрольні суми — у SHA256SUMS.txt.
+[ZIP 4.0.0](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.0.0-project.zip) · [APK 4.0.0](https://github.com/salenko93-hash/HolosCalendar-Download/raw/refs/heads/main/HolosCalendar-4.0.0-debug.apk). Старі файли збережено.
