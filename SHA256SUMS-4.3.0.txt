@@ -1,0 +1,3 @@
+9d236352d48edfd37ab15cc2e31315b23997ec5639e14dd5664c3c3ca9542e4b  HolosCalendar-4.3.0-debug.apk
+692d2bac04eba09f1403adbfa7ebdcca81a388614eb4898933a5b1ca07938d75  HolosCalendar-4.3.0-project.zip
+600a68502cb51116f851ff0e139ea76516eda15429c957b7c1c7e0cd8665e808  HolosCalendar-Ukrainian-4.3.0.pdf
