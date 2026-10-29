@@ -11,7 +11,7 @@
             <TextView style="@style/Step" android:text="@string/step_input"/>
             <TextView style="@style/Caption" android:text="@string/raw_label" android:labelFor="@id/raw" android:layout_marginTop="20dp"/>
             <TextView style="@style/Caption" android:text="@string/example_hint" android:layout_marginTop="8dp"/>
-            <EditText android:importantForAutofill="no" android:id="@+id/raw" style="@style/Field" android:minLines="2" android:maxLength="1000" android:gravity="top|start"/>
+            <EditText android:importantForAutofill="no" android:id="@+id/raw" style="@style/Field" android:minLines="2" android:gravity="top|start"/>
             <Button android:id="@+id/example" style="@style/FormButton" android:text="@string/example"/>
             <Button android:id="@+id/parse" style="@style/PrimaryButton" android:text="@string/parse"/>
         </LinearLayout>

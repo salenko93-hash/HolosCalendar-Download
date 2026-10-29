@@ -25,6 +25,7 @@ final class DurationParser {
     private static final Pattern REVERSED=pattern("\\bхвилин\\s+на\\s+("+Q+")\\b");
     private static final Pattern VAGUE=pattern("\\b(?:на\\s+кілька\\s+хвилин|до\\s+кінця\\s+дня)\\b");
     private static final Pattern ALL_DAY=pattern("\\bна\\s+весь\\s+день\\b");
+    private static final Pattern OFFSET_HOURS_PREFIX=pattern("(?s).*\\b(?:через|за)\\s+(?:"+Q+"\\s*)?"+HOUR+"\\b\\.?(?:\\s+(?:і|та))?$");
     private static final Pattern BARE=pattern("(?<![\\p{L}\\d])("+Q+")\\s*("+HOUR+"|"+MINUTE+")\\b\\.?");
     private static void erase(StringBuilder text,Matcher match) { for(int i=match.start();i<match.end();i++) text.setCharAt(i,' '); }
     static Result consume(StringBuilder text) {
@@ -61,6 +62,7 @@ final class DurationParser {
         while(bare.find()) {
             String prefix=text.substring(0,bare.start()).trim().toLowerCase(Locale.ROOT);
             if(prefix.matches("(?s).*\\b(?:через|за|о|об)$")) continue;
+            if(OFFSET_HOURS_PREFIX.matcher(prefix).matches()) continue;
             count++;
             try { minutes=UkrainianNumbers.quantity(bare.group(1)).multiply(BigDecimal.valueOf(bare.group(2).toLowerCase(Locale.ROOT).startsWith("год")?60:1)).intValueExact();
                 if(minutes<1||minutes>1440) invalid=true;

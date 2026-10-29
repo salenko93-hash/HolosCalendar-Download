@@ -83,6 +83,31 @@ public class NaturalFlowTest {
             }
         }
     }
+    @Test public void compoundRelativeStartIsSavedWithoutInventingDuration() {
+        String title="Дзвінок "+UUID.randomUUID();
+        Instant before=Instant.now();
+        try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
+            screen.onActivity(activity->{text(activity,"Через годину і двадцять хвилин "+title);activity.findViewById(R.id.save_local).performClick();});
+            SavedEvent event=saved(title);
+            long seconds=Duration.between(before,event.start).getSeconds();
+            assertTrue(seconds>=80*60&&seconds<83*60);
+            assertNull(event.durationMinutes);assertNull(event.reminderMinutes);
+        }
+    }
+    @Test public void twoWrittenWeeklyDaysPersistAsOneSeries() {
+        String title="Зустріч "+UUID.randomUUID();
+        try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
+            screen.onActivity(activity->{text(activity,"Заплануйте завтра щопонеділка та щосереди о 15:00 "+title);activity.findViewById(R.id.save_local).performClick();});
+            SavedEvent event=saved(title);assertEquals("W:1,3",event.recurrence);
+            LocalDate anchor=event.start.atZone(event.zone).toLocalDate();
+            Set<Integer> days=new HashSet<>();
+            try(EventStore store=new EventStore(context)) {
+                for(SavedEvent occurrence:store.between(anchor.atStartOfDay(event.zone).toInstant(),anchor.plusDays(14).atStartOfDay(event.zone).toInstant(),event.zone))
+                    if(occurrence.id==event.id) days.add(occurrence.start.atZone(event.zone).getDayOfWeek().getValue());
+            }
+            assertEquals(new HashSet<>(Arrays.asList(1,3)),days);assertNull(event.durationMinutes);
+        }
+    }
     @Test public void seriesKeepsItsOriginalWallTimeAndZoneAfterRecreationWhileTravelling() {
         TimeZone original=TimeZone.getDefault();
         try {

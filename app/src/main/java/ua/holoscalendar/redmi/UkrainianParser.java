@@ -38,9 +38,9 @@ final class UkrainianParser {
     }
     EventTextParser.Result parse() {
         String fallback="";
-        Matcher command=match("^(нагадай|заплануй|створи|додай|постав)(?:\\s+(подію|нагадування))?\\b\\s*");
+        Matcher command=match("^(?:будь\\s+ласка[, ]*\\s*)?(нагадай(?:те)?|заплануй(?:те)?|створи|створіть|додай(?:те)?|постав(?:те)?)(?:\\s+мені)?(?:\\s+(подію|нагадування))?\\b\\s*");
         if(command.find()) {
-            boolean notify=lower(command.group(1)).equals("нагадай")||"нагадування".equalsIgnoreCase(command.group(2));
+            boolean notify=lower(command.group(1)).startsWith("нагада")||"нагадування".equalsIgnoreCase(command.group(2));
             if(notify) { reminder=0; fallback="Нагадування"; }
             else if(command.group(2)!=null) fallback="Подія";
             erase(command);
@@ -94,11 +94,27 @@ final class UkrainianParser {
             catch(DateTimeException bad) { recurrenceChoice=true;warn("Некоректна дата щорічного повторення"); }
             erase(annual);
         }
-        Matcher weekly=match("\\b(?:що|кожн(?:ої|ого)\\s+)("+WEEKDAY+")\\b");
-        while(weekly.find()) { count++;recurrence="W:"+weekday(weekly.group(1));erase(weekly); }
-        Matcher ordinary=match("\\b(щодня|кожного\\s+ранку|щовечора|по\\s+буднях|тільки\\s+у\\s+вихідні|раз\\s+на\\s+два\\s+дні)\\b");
+        Matcher interval=match("\\b(?:кожні|раз\\s+на)\\s+("+Q+")\\s+дн(?:і|ів)\\b");
+        while(interval.find()) {
+            count++;
+            try {
+                int days=UkrainianNumbers.quantity(interval.group(1)).intValueExact();
+                if(days<1||days>366) throw new IllegalArgumentException();
+                recurrence="D:"+days;
+            } catch(IllegalArgumentException|ArithmeticException bad) { recurrenceChoice=true;warn("Некоректний інтервал повторення — оберіть його вручну"); }
+            erase(interval);
+        }
+        SortedSet<Integer> days=new TreeSet<>();int previousEnd=-1;
+        Matcher weekly=match("\\b(?:що|кожн(?:ої|ого|у|ий)\\s+|кожен\\s+|щотижня\\s+(?:(?:у|в)\\s+)?)("+WEEKDAY+")\\b");
+        while(weekly.find()) {
+            if(previousEnd>=0 && p("[\\s,]*(?:(?:і|й|та)[\\s,]*)?").matcher(text.substring(previousEnd,weekly.start())).matches())
+                for(int i=previousEnd;i<weekly.start();i++) text.setCharAt(i,' ');
+            days.add(weekday(weekly.group(1)));previousEnd=weekly.end();erase(weekly);
+        }
+        if(!days.isEmpty()) { count++;List<String> labels=new ArrayList<>();for(int day:days) labels.add(Integer.toString(day));recurrence="W:"+String.join(",",labels); }
+        Matcher ordinary=match("\\b(щодня|щоденно|кожен\\s+день|раз\\s+на\\s+день|кожного\\s+ранку|щовечора|щобудня|по\\s+буднях|щовихідних|тільки\\s+у\\s+вихідні)\\b");
         while(ordinary.find()) {
-            count++;String word=lower(ordinary.group());recurrence=word.contains("буднях")?"W:1,2,3,4,5":word.contains("вихідні")?"W:6,7":word.startsWith("раз")?"D:2":"D:1";
+            count++;String word=lower(ordinary.group());recurrence=word.contains("будн")?"W:1,2,3,4,5":word.contains("вихідн")?"W:6,7":"D:1";
             if(word.contains("ранку")||word.equals("щовечора")) warn("Для повторення вранці чи ввечері оберіть точний час");
             erase(ordinary);
         }
@@ -127,6 +143,24 @@ final class UkrainianParser {
                 setDate(first);endDate=first.withDayOfMonth(b).plusDays(1);allDay=true;duration=null;
             } catch(IllegalArgumentException|DateTimeException bad) { setDate(null);warn("Некоректний діапазон дат — оберіть дати вручну"); }
             erase(range);
+        }
+        Matcher weekDate=match("\\b(?:(?:у|в|на)\\s+)?("+WEEKDAY+")\\s+(цього|наступного)\\s+тижня\\b");
+        while(weekDate.find()) {
+            LocalDate monday=now.toLocalDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            if(lower(weekDate.group(2)).equals("наступного")) monday=monday.plusWeeks(1);
+            setDate(monday.plusDays(weekday(weekDate.group(1))-1));erase(weekDate);
+        }
+        Matcher calendarOffset=match("\\b(?:через|за)\\s+(?:("+Q+")\\s+)?(місяць|місяця|місяці|місяців|рік|року|роки|років)\\b");
+        while(calendarOffset.find()) {
+            try {
+                int amount=UkrainianNumbers.quantity(calendarOffset.group(1)).intValueExact();
+                boolean months=lower(calendarOffset.group(2)).startsWith("місяц");
+                if(amount<1||amount>(months?120:10)) throw new IllegalArgumentException();
+                LocalDate target=months?now.toLocalDate().plusMonths(amount):now.toLocalDate().plusYears(amount);
+                setDate(target);
+                if(target.getDayOfMonth()!=now.getDayOfMonth()) { confirm=true;warn("У вибраному місяці немає такого числа — підтвердьте останній день місяця"); }
+            } catch(IllegalArgumentException|ArithmeticException|DateTimeException bad) { setDate(null);warn("Некоректний проміжок місяців або років"); }
+            erase(calendarOffset);
         }
         Matcher offset=match("\\b(?:через|за)\\s+(?:("+Q+")\\s+)?(день|дні|днів|тиждень|тижні|тижнів)\\b");
         while(offset.find()) {
@@ -167,12 +201,18 @@ final class UkrainianParser {
         while(vague.find()) { setDate(null);warn("Цей вираз не задає точної дати — оберіть її вручну");erase(vague); }
     }
     private void offsets() {
-        Matcher offset=match("\\b(?:через|за)\\s+(?:("+Q+")\\s*)?(хвилин(?:к[ауи]|а|у|и)?|хв|годин(?:к[ауи]|а|у|и)?|год)\\b\\.?");
+        Matcher offset=match("\\b(?:через|за)\\s+(?:("+Q+")\\s*)?(хвилин(?:к[ауи]|а|у|и)?|хв|годин(?:к[ауи]|а|у|и)?|год)\\b\\.?(?:\\s+(?:(?:і|та)\\s+)?("+Q+")\\s*(?:хвилин(?:а|у|и)?|хв)\\b\\.?)?");
         while(offset.find()) {
             if(offsetSeen||dateSeen||timeSeen) conflict=true;
             offsetSeen=true;dateSeen=true;timeSeen=true;
             try {
-                int minutes=UkrainianNumbers.quantity(offset.group(1)).multiply(BigDecimal.valueOf(lower(offset.group(2)).startsWith("год")?60:1)).intValueExact();
+                boolean hours=lower(offset.group(2)).startsWith("год");
+                BigDecimal total=UkrainianNumbers.quantity(offset.group(1)).multiply(BigDecimal.valueOf(hours?60:1));
+                if(offset.group(3)!=null) {
+                    if(!hours) throw new IllegalArgumentException("Repeated minute unit");
+                    total=total.add(UkrainianNumbers.quantity(offset.group(3)));
+                }
+                int minutes=total.intValueExact();
                 if(minutes<1||minutes>10080) throw new IllegalArgumentException("Invalid offset");
                 ZonedDateTime target=now.plusMinutes(minutes);if(target.getSecond()!=0||target.getNano()!=0) target=target.plusMinutes(1);
                 target=target.withSecond(0).withNano(0); date=target.toLocalDate();time=target.toLocalTime();instant=target.toInstant();
@@ -238,6 +278,8 @@ final class UkrainianParser {
         while(special.find()) { setTime(lower(special.group()).equals("опівдні")?LocalTime.NOON:LocalTime.MIDNIGHT);erase(special); }
         Matcher half=match("\\b(?:о\\s+)?(пів|чверть)\\s+на\\s+("+O+")(?:\\s+("+PART+"))?\\b");
         while(half.find()) { fractional(half.group(2),lower(half.group(1)).equals("пів")?30:15,half.group(3));erase(half); }
+        Matcher halfOf=match("\\b(?:о\\s+)?пів\\s+("+O+")(?:\\s+("+PART+"))?\\b");
+        while(halfOf.find()) { fractional(halfOf.group(1),30,halfOf.group(2));erase(halfOf); }
         Matcher before=match("\\b(?:о\\s+)?(?:за\\s+чверть|без\\s+десяти)\\s+("+O+")(?:\\s+("+PART+"))?\\b");
         while(before.find()) { fractional(before.group(1),lower(before.group()).contains("чверть")?45:50,before.group(2));erase(before); }
         Matcher minute=match("\\bо\\s+("+Q+")\\s+хвилин\\s+на\\s+("+O+")(?:\\s+("+PART+"))?\\b");
@@ -255,13 +297,15 @@ final class UkrainianParser {
             } catch(IllegalArgumentException|DateTimeException bad) { setTime(null); }
             confirm=true;warn("Час приблизний — перевірте й підтвердьте його");erase(approximate);
         }
-        Matcher direct=match("\\b(?:о|об)\\s+("+TIME+")(?:\\s+("+PART+"))?\\b");
+        Matcher direct=match("\\b(?:о|об)\\s+("+TIME+")(\\s+годині)?(?:\\s+("+PART+"))?\\b");
         while(direct.find()) {
-            if(direct.group(2)==null && direct.group(1).matches("\\d.*")) continue; // Keep strict legacy numeric validation.
+            String token=direct.group(1),part=direct.group(3);
+            boolean numeric=token.matches("\\d.*");
+            if(part==null && direct.group(2)==null && numeric) continue; // Strict legacy numeric validation.
             try {
-                LocalTime value=exact(direct.group(1),direct.group(2)); setTime(value);
-                if(value==null&&direct.group(2)==null) { int h=UkrainianNumbers.ordinal(direct.group(1))%12;choices.add(LocalTime.of(h,0));choices.add(LocalTime.of(h+12,0)); }
-                else if(value==null) warn("Час суперечить частині доби — уточніть його");
+                LocalTime value=exact(token,part);setTime(value);
+                if(value==null&&part==null&&!numeric) { int h=UkrainianNumbers.ordinal(token)%12;choices.add(LocalTime.of(h,0));choices.add(LocalTime.of(h+12,0)); }
+                else if(value==null) warn("Час суперечить частині доби або має некоректне значення — уточніть його");
             } catch(IllegalArgumentException|DateTimeException bad) { setTime(null);warn("Некоректний час — оберіть його вручну"); }
             erase(direct);
         }

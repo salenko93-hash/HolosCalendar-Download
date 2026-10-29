@@ -28,6 +28,7 @@ import java.util.Locale;
 /** Edits one local event; optional system-calendar handoff remains a separate action. */
 public final class EventEditorActivity extends Activity {
     static final String EVENT_ID = "eventId";
+    private static final int MAX_DESCRIPTION_LENGTH = 1000;
     private static final int[] DURATIONS = {15, 30, 60, 90, 120};
     private static final Locale UK = Locale.forLanguageTag("uk-UA");
     private EditText raw, name;
@@ -83,6 +84,8 @@ public final class EventEditorActivity extends Activity {
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String current = s.toString().trim();
                 sourceDirty = !current.isEmpty() && !current.equals(lastParsedText);
+                if (descriptionTooLong()) return;
+                raw.setError(null);
                 setStatus(getString(sourceDirty ? R.string.dirty_source : current.isEmpty()
                         ? R.string.initial_status : R.string.review_ready), sourceDirty);
             }
@@ -189,6 +192,7 @@ public final class EventEditorActivity extends Activity {
     }
 
     private void parse() {
+        if (descriptionTooLong()) { raw.requestFocus(); return; }
         String text = raw.getText().toString().trim();
         if (text.isEmpty()) { raw.setError(getString(R.string.empty_input)); raw.requestFocus(); return; }
         EventTextParser.Result result = EventTextParser.parse(text, ZonedDateTime.now(eventZone));
@@ -212,6 +216,14 @@ public final class EventEditorActivity extends Activity {
         InputMethodManager keyboard = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         keyboard.hideSoftInputFromWindow(raw.getWindowToken(), 0);
         findViewById(R.id.status).requestRectangleOnScreen(new android.graphics.Rect(0, 0, status.getWidth(), status.getHeight()));
+    }
+
+    private boolean descriptionTooLong() {
+        if (raw.length() <= MAX_DESCRIPTION_LENGTH) return false;
+        String message = getString(R.string.description_too_long, MAX_DESCRIPTION_LENGTH);
+        raw.setError(message);
+        setStatus(message, true);
+        return true;
     }
 
     private void updateReadiness() {
@@ -370,6 +382,7 @@ public final class EventEditorActivity extends Activity {
     private void openCalendar() { prepareEvent(false); }
 
     private void prepareEvent(boolean local) {
+        if (descriptionTooLong()) { raw.requestFocus(); return; }
         refresh();
         if (sourceDirty) { raw.setError(getString(R.string.dirty_source)); raw.requestFocus(); return; }
         String title = name.getText().toString().trim();

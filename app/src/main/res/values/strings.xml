@@ -30,6 +30,7 @@
     <string name="continue_action">Продовжити</string>
     <string name="initial_status">Можна також заповнити деталі вручну.</string>
     <string name="empty_input">Введіть опис події</string>
+    <string name="description_too_long">Опис довший за %1$d символів. Скоротіть його перед розбором або збереженням. Текст залишено повністю.</string>
     <string name="missing_name">Додайте назву події</string>
     <string name="dirty_source">Текст змінено. Натисніть «Розібрати текст», щоб оновити деталі.</string>
     <string name="past_title">Подія в минулому</string>

@@ -2,6 +2,7 @@ package ua.holoscalendar.redmi;
 
 import android.widget.EditText;
 import android.widget.TextView;
+import android.database.DatabaseUtils;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import org.junit.Test;
@@ -21,6 +22,11 @@ public class TextEntryTest {
     }
     private String repeated(char value,int count) {
         char[] text=new char[count]; Arrays.fill(text,value); return new String(text);
+    }
+    private long eventCount(EventEditorActivity activity) {
+        try (EventStore store=new EventStore(activity)) {
+            return DatabaseUtils.queryNumEntries(store.getReadableDatabase(),"events");
+        }
     }
     @Test public void textPopulatesFormWithoutClosing() {
         try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
@@ -49,13 +55,47 @@ public class TextEntryTest {
             });
         }
     }
-    @Test public void textInputIsBoundedWithoutChangingManualTitle() {
+    @Test public void longPasteIsPreservedAndCannotReplaceOrSavePreviousDetails() {
         try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
             screen.onActivity(activity->{
+                enter(activity,"Завтра о 14:30 Нарада на 45 хвилин");
                 ((EditText)activity.findViewById(R.id.name)).setText("Моя подія");
-                ((EditText)activity.findViewById(R.id.raw)).setText(repeated('а',1001));
-                assertEquals(1000,((EditText)activity.findViewById(R.id.raw)).length());
+                String complete="Завтра о 15:00 "+repeated('а',1001)+" на годину";
+                enter(activity,complete);
+                assertEquals(complete,((EditText)activity.findViewById(R.id.raw)).getText().toString());
+                assertNotNull(((EditText)activity.findViewById(R.id.raw)).getError());
                 assertEquals("Моя подія",((EditText)activity.findViewById(R.id.name)).getText().toString());
+                assertTrue(((TextView)activity.findViewById(R.id.time)).getText().toString().contains("14:30"));
+                assertTrue(((TextView)activity.findViewById(R.id.duration)).getText().toString().contains("45"));
+                long previousCount=eventCount(activity);
+                activity.findViewById(R.id.save_local).performClick();
+                assertEquals(previousCount,eventCount(activity));
+                assertEquals(activity.getString(R.string.description_too_long,1000),
+                        ((TextView)activity.findViewById(R.id.status)).getText().toString());
+                assertFalse(activity.isFinishing());
+            });
+        }
+    }
+    @Test public void descriptionOfExactlyOneThousandCharactersCanBeParsed() {
+        try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
+            screen.onActivity(activity->{
+                String prefix="Завтра о 14:30 ";String title=repeated('а',1000-prefix.length());
+                enter(activity,prefix+title);
+                assertNull(((EditText)activity.findViewById(R.id.raw)).getError());
+                assertEquals(title,((EditText)activity.findViewById(R.id.name)).getText().toString());
+            });
+        }
+    }
+    @Test public void longDescriptionSurvivesRecreationAndCanBeShortened() {
+        String complete="Завтра о 15:00 "+repeated('а',1001)+" кінець";
+        try(ActivityScenario<EventEditorActivity> screen=ActivityScenario.launch(EventEditorActivity.class)) {
+            screen.onActivity(activity->enter(activity,complete));
+            screen.recreate();
+            screen.onActivity(activity->{
+                assertEquals(complete,((EditText)activity.findViewById(R.id.raw)).getText().toString());
+                enter(activity,"Завтра о 15:00 Нова подія");
+                assertNull(((EditText)activity.findViewById(R.id.raw)).getError());
+                assertEquals("Нова подія",((EditText)activity.findViewById(R.id.name)).getText().toString());
             });
         }
     }
