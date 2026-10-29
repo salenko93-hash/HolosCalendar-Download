@@ -1,0 +1,36 @@
+{
+  "version": "4.2.0",
+  "versionCode": 12,
+  "applicationId": "ua.holoscalendar.redmi",
+  "public_source_commit": "29f2004c0f102c03dafef0593faad549538c6b97",
+  "public_source_tree": "a22a6e70a981ac0c4f48ab14965b41095ee73a7b",
+  "base_reviewed_apk_version": "3.1.0",
+  "base_reviewed_apk_sha256": "100a22798833d5b5b5c3948e9de1901732915f20b40332b604de3b0e9b5992ab",
+  "apk_sha256": "a0458abc836b839b2a98a079fd89e083fc54679e45b2c3432147b960d54b582c",
+  "pdf_sha256": "1cee67c403c4d969906b169e3969480753a7dae1134f4bb5f30b223dec85bd9c",
+  "signing_certificate_sha256": "78b4c9d5608ebfc512c2ef79acaa19a57f9e72c979e74e4120ce4015a06585ab",
+  "android_api26_tests": {
+    "tests": 63,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "jvm_tests": {
+    "tests": 190,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "lint_issues": 0,
+  "minimum_sdk": 26,
+  "target_sdk": 35,
+  "abis": [
+    "arm64-v8a",
+    "x86_64"
+  ],
+  "limitations": [
+    "Physical Redmi notification, Doze, MIUI/HyperOS behavior not verified.",
+    "API35 runtime tests not locally executed for 4.2.0.",
+    "Speech weights downloaded separately; no model fine-tuning performed."
+  ]
+}

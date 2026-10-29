@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<testsuite name="ua.holoscalendar.redmi.DurationFlowTest" tests="63" failures="0" errors="0" skipped="0" time="386.79" timestamp="2026-10-29T11:59:36" hostname="localhost">
+  <properties>
+    <property name="device" value="emulator-5554 - 8.0.0" />
+    <property name="flavor" value="" />
+    <property name="project" value=":app" />
+  </properties>
+  <testcase name="spokenDurationSurvivesRecreationAndSetsTheActualEndTime" classname="ua.holoscalendar.redmi.DurationFlowTest" time="18.504" />
+  <testcase name="newPhraseWithoutDurationClearsPreviouslyRecognizedValue" classname="ua.holoscalendar.redmi.DurationFlowTest" time="8.988" />
+  <testcase name="relativeStartDoesNotBecomeMeetingDuration" classname="ua.holoscalendar.redmi.DurationFlowTest" time="9.388" />
+  <testcase name="newAndRecreatedFormDoesNotHaveADefaultDuration" classname="ua.holoscalendar.redmi.DurationFlowTest" time="8.073" />
+  <testcase name="originalUserPhraseDoesNotSendAnInventedEndTime" classname="ua.holoscalendar.redmi.DurationFlowTest" time="16.266" />
+  <testcase name="cancelledSpeechPreservesRecognizedDuration" classname="ua.holoscalendar.redmi.DurationFlowTest" time="7.12" />
+  <testcase name="eventAndUnknownDurationSurviveClosingTheDatabase" classname="ua.holoscalendar.redmi.EventStoreTest" time="1.045" />
+  <testcase name="queryIncludesOvernightEventsButExcludesEndsAtMidnight" classname="ua.holoscalendar.redmi.EventStoreTest" time="1.817" />
+  <testcase name="deletedEventDoesNotComeBackOnUpdate" classname="ua.holoscalendar.redmi.EventStoreTest" time="0.605" />
+  <testcase name="meetingsAreOrderedByStartAndId" classname="ua.holoscalendar.redmi.EventStoreTest" time="0.18" />
+  <testcase name="secondAutumnOccurrenceIsPreservedExactly" classname="ua.holoscalendar.redmi.EventStoreTest" time="0.364" />
+  <testcase name="editingUpdatesOneEventAndCanRemoveItsDuration" classname="ua.holoscalendar.redmi.EventStoreTest" time="0.387" />
+  <testcase name="seriesKeepsItsOriginalWallTimeAndZoneAfterRecreationWhileTravelling" classname="ua.holoscalendar.redmi.NaturalFlowTest" time="6.558" />
+  <testcase name="dailySpokenSeriesSavesOneMasterAndAppearsOnFollowingDays" classname="ua.holoscalendar.redmi.NaturalFlowTest" time="8.998" />
+  <testcase name="ambiguousSpokenHourSurvivesRecreationAndCannotBeSilentlySaved" classname="ua.holoscalendar.redmi.NaturalFlowTest" time="7.177" />
+  <testcase name="naturalCommandSavesTheCorrectTimeAndEnablesTheRequestedReminder" classname="ua.holoscalendar.redmi.NaturalFlowTest" time="9.387" />
+  <testcase name="vacationRangeSavesWithoutDemandingAClockAndSurvivesRecreation" classname="ua.holoscalendar.redmi.NaturalFlowTest" time="10.023" />
+  <testcase name="invalidModelImportFinishesWithoutDamagingTheExistingModel" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="5.648" />
+  <testcase name="localUkrainianResultFillsTheExistingParserWithoutInventingDuration" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="5.824" />
+  <testcase name="oversizedLocalResultCannotSilentlyTruncateOrReplaceTheForm" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="5.142" />
+  <testcase name="cancellingLocalSpeechPreservesTheEditedEvent" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="8.751" />
+  <testcase name="localVoiceButtonOpensThePrivateLocalScreenRatherThanTheGoogleIntent" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="5.707" />
+  <testcase name="realJniLibraryLoadsAndRejectsInvalidWeightsGracefully" classname="ua.holoscalendar.redmi.OfflineSpeechFlowTest" time="0.884" />
+  <testcase name="existingLauncherShortcutOpensTheOwnCalendar" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="0.431" />
+  <testcase name="savingAndSavingAgainAfterRecreationDoesNotDuplicateTheMeeting" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="15.831" />
+  <testcase name="localCalendarShowsTheStoredMeetingAndRestoresItsMonth" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="13.947" />
+  <testcase name="reminderSettingSurvivesRecreationAndUpdatingTheMeeting" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="11.775" />
+  <testcase name="editingLoadsStoredFieldsAndUpdatesTheSameRecord" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="7.319" />
+  <testcase name="missingRecordIsNotSilentlyCreatedAgain" classname="ua.holoscalendar.redmi.OwnCalendarFlowTest" time="6.075" />
+  <testcase name="zeroAndMaximumOffsetsAreAcceptedAndCanBeDisabled" classname="ua.holoscalendar.redmi.ReminderEditorFlowTest" time="6.513" />
+  <testcase name="validatesCustomOffsetAndKeepsItAfterRecreation" classname="ua.holoscalendar.redmi.ReminderEditorFlowTest" time="6.95" />
+  <testcase name="customReminderIsSavedWithoutInventingDuration" classname="ua.holoscalendar.redmi.ReminderEditorFlowTest" time="21.427" />
+  <testcase name="postsTheMeetingOnceAndDoesNotInventAnEndTime" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="3.33" />
+  <testcase name="tappingNotificationIntentOpensTheMatchingMeeting" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="17.522" />
+  <testcase name="missedDailySeriesCatchesUpBothDueOccurrencesInOneWakeUp" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="3.477" />
+  <testcase name="eachNotificationHasItsOwnMeetingIntent" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="2.878" />
+  <testcase name="testNotificationDoesNotConsumeAnEventReminder" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="1.229" />
+  <testcase name="realSystemAlarmDeliversWithoutAnOpenEditor" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="22.712" />
+  <testcase name="staleOrDeletedMeetingDoesNotPostANotification" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="2.773" />
+  <testcase name="oneWakeUpDeliversEveryDueMeetingWithoutDuplicates" classname="ua.holoscalendar.redmi.ReminderRuntimeTest" time="5.329" />
+  <testcase name="dueSnapshotIncludesOnlyPendingRemindersAndSurvivesReopening" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="2.22" />
+  <testcase name="movingMeetingRejectsStaleAlarmAndEnablesNewReminder" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.381" />
+  <testcase name="failedNotificationCanReleaseClaimForRetry" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.431" />
+  <testcase name="expiredMeetingIsNotReplayedAfterBoot" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.275" />
+  <testcase name="choosesTheNextReminderRatherThanTheNextMeeting" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.253" />
+  <testcase name="claimedReminderDoesNotRepeatAfterReopeningDatabase" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.697" />
+  <testcase name="disablingOrDeletingReminderRemovesItFromQueue" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="1.075" />
+  <testcase name="migrationKeepsExistingMeetingsWithoutEnablingUnrequestedReminders" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.878" />
+  <testcase name="renamingAlreadyAnnouncedMeetingDoesNotRepeatItsReminder" classname="ua.holoscalendar.redmi.ReminderStoreTest" time="0.857" />
+  <testcase name="allDayReminderRequiresClockSelectionAndPersistsIt" classname="ua.holoscalendar.redmi.SeriesStoreTest" time="0.596" />
+  <testcase name="recurringReminderAdvancesAfterAnAtomicClaim" classname="ua.holoscalendar.redmi.SeriesStoreTest" time="0.669" />
+  <testcase name="migrationFromVersionTwoKeepsTheMeetingAndReminder" classname="ua.holoscalendar.redmi.SeriesStoreTest" time="0.46" />
+  <testcase name="allDayVacationIncludesItsLastDayAndHasNoInventedClockOrDuration" classname="ua.holoscalendar.redmi.SeriesStoreTest" time="0.281" />
+  <testcase name="oneSeriesRecordProducesFutureOccurrencesAndDeletionRemovesThemAll" classname="ua.holoscalendar.redmi.SeriesStoreTest" time="0.28" />
+  <testcase name="longSpeechIsRejectedWithoutTruncatingExistingForm" classname="ua.holoscalendar.redmi.SpeechResultTest" time="9.107" />
+  <testcase name="recognizedTitleIsNotSilentlyTruncatedAtTwoHundredCharacters" classname="ua.holoscalendar.redmi.SpeechResultTest" time="4.826" />
+  <testcase name="successfulSpeechResultPopulatesFormWithoutClosing" classname="ua.holoscalendar.redmi.SpeechResultTest" time="5.415" />
+  <testcase name="cancelledSpeechPreservesExistingForm" classname="ua.holoscalendar.redmi.SpeechResultTest" time="8.944" />
+  <testcase name="parserValidationAlsoWorksOnAndroidRuntime" classname="ua.holoscalendar.redmi.SpeechResultTest" time="1.518" />
+  <testcase name="revertingSourceAfterRecreationKeepsManualEditsAndDoesNotRequireReparse" classname="ua.holoscalendar.redmi.SpeechResultTest" time="8.426" />
+  <testcase name="emptySpeechResultPreservesExistingForm" classname="ua.holoscalendar.redmi.SpeechResultTest" time="6.064" />
+  <testcase name="relativeInstantSurvivesRecreationAndTimezoneChange" classname="ua.holoscalendar.redmi.SpeechResultTest" time="6.548" />
+  <testcase name="speechResultWorksAfterRecreation" classname="ua.holoscalendar.redmi.SpeechResultTest" time="6.618" />
+</testsuite>
