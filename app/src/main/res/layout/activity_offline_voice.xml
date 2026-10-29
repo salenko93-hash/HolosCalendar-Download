@@ -1,0 +1,21 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/offline_scroll" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+        <TextView style="@style/Body" android:text="@string/offline_title" android:textSize="26sp" android:textStyle="bold"/>
+        <TextView style="@style/Caption" android:text="@string/offline_privacy" android:layout_marginTop="12dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/card" android:layout_marginTop="20dp">
+            <TextView android:id="@+id/offline_model_state" style="@style/Body" android:textStyle="bold"/>
+            <TextView style="@style/Caption" android:text="@string/offline_install_help" android:layout_marginTop="8dp"/>
+            <Button android:id="@+id/offline_download" style="@style/FormButton" android:text="@string/offline_download"/>
+            <Button android:id="@+id/offline_import" style="@style/FormButton" android:text="@string/offline_import"/>
+            <Button android:id="@+id/offline_remove" style="@style/FormButton" android:text="@string/offline_remove"/>
+        </LinearLayout>
+        <TextView android:id="@+id/offline_status" style="@style/Body" android:accessibilityLiveRegion="polite" android:layout_marginTop="20dp"/>
+        <ProgressBar android:id="@+id/offline_progress" android:layout_width="48dp" android:layout_height="48dp" android:layout_gravity="center_horizontal" android:visibility="gone" android:contentDescription="@string/offline_processing"/>
+        <TextView android:id="@+id/offline_timer" style="@style/Body" android:visibility="gone" android:gravity="center" android:layout_marginTop="12dp"/>
+        <Button android:id="@+id/offline_record" style="@style/PrimaryButton" android:text="@string/offline_record"/>
+        <Button android:id="@+id/offline_stop" style="@style/PrimaryButton" android:text="@string/offline_stop" android:visibility="gone"/>
+        <Button android:id="@+id/offline_microphone_settings" style="@style/FormButton" android:text="@string/offline_microphone_settings"/>
+        <TextView style="@style/Caption" android:text="@string/offline_review_hint" android:layout_marginTop="16dp"/>
+        <Button android:id="@+id/offline_cancel" style="@style/FormButton" android:text="@string/offline_back" android:layout_marginBottom="16dp"/>
+    </LinearLayout>
+</ScrollView>

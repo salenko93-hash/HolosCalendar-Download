@@ -1,0 +1,44 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/scroll" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="20dp">
+        <TextView style="@style/Body" android:text="@string/app_name" android:textStyle="bold"
+            android:textSize="23sp" android:minHeight="44dp" android:gravity="center_vertical"
+            android:drawableStart="@drawable/app_brand_icon" android:drawablePadding="12dp" />
+        <Button android:id="@+id/my_calendar" style="@style/FormButton" android:text="@string/my_calendar"/>
+        <TextView style="@style/Caption" android:text="@string/eyebrow" android:textSize="11sp" android:letterSpacing="0.1" android:layout_marginTop="24dp"/>
+        <TextView style="@style/Body" android:text="@string/headline" android:textSize="28sp" android:fontFamily="sans-serif-medium" android:layout_marginTop="12dp"/>
+        <TextView style="@style/Caption" android:text="@string/intro" android:layout_marginTop="12dp" android:layout_marginBottom="24dp"/>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/card">
+            <TextView style="@style/Step" android:text="@string/step_input"/>
+            <Button android:id="@+id/voice_mode" style="@style/FormButton" android:text="@string/voice_mode_local"/>
+            <Button android:id="@+id/voice" style="@style/PrimaryButton" android:text="@string/voice" android:drawableStart="@drawable/ic_microphone" android:drawablePadding="8dp"/>
+            <TextView style="@style/Caption" android:text="@string/raw_label" android:labelFor="@id/raw" android:layout_marginTop="20dp"/>
+            <TextView style="@style/Caption" android:text="@string/example_hint" android:layout_marginTop="8dp"/>
+            <EditText android:importantForAutofill="no" android:id="@+id/raw" style="@style/Field" android:minLines="2" android:maxLength="1000" android:gravity="top|start"/>
+            <Button android:id="@+id/example" style="@style/FormButton" android:text="@string/example"/>
+            <Button android:id="@+id/parse" style="@style/FormButton" android:text="@string/parse"/>
+        </LinearLayout>
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:background="@drawable/card" android:layout_marginTop="16dp">
+            <TextView style="@style/Step" android:text="@string/step_review"/>
+            <TextView style="@style/Caption" android:text="@string/review_hint"/>
+            <TextView style="@style/Caption" android:text="@string/name_label" android:labelFor="@id/name" android:layout_marginTop="20dp"/>
+            <EditText android:importantForAutofill="no" android:id="@+id/name" style="@style/Field" android:maxLength="1000"/>
+            <Button android:id="@+id/event_type" style="@style/FormButton" android:text="@string/type_timed"/>
+            <Button android:id="@+id/recurrence" style="@style/FormButton" android:text="@string/repeat_title"/>
+            <TextView android:id="@+id/series_hint" style="@style/Caption" android:text="@string/series_hint" android:visibility="gone"/>
+            <Button android:id="@+id/date" style="@style/FormButton" android:text="@string/choose_date"/>
+            <Button android:id="@+id/end_date" style="@style/FormButton" android:visibility="gone"/>
+            <Button android:id="@+id/time" style="@style/FormButton" android:text="@string/choose_time"/>
+            <Button android:id="@+id/duration" style="@style/FormButton"/>
+            <Button android:id="@+id/reminder" style="@style/FormButton" android:text="@string/reminder_off"/>
+            <TextView android:id="@+id/reminder_hint" style="@style/Caption" android:layout_marginTop="8dp" android:text="@string/reminder_local_only"/>
+            <Button android:id="@+id/reminder_settings" style="@style/FormButton" android:text="@string/reminder_settings" android:visibility="gone"/>
+            <TextView android:id="@+id/timezone" style="@style/Caption" android:layout_marginTop="12dp"/>
+            <TextView android:id="@+id/status" style="@style/Body" android:layout_marginTop="20dp" android:accessibilityLiveRegion="polite" android:text="@string/initial_status"/>
+            <Button android:id="@+id/save_local" style="@style/PrimaryButton" android:text="@string/save_local"/>
+            <Button android:id="@+id/save" style="@style/FormButton" android:text="@string/continue_calendar"/>
+        </LinearLayout>
+        <Button android:id="@+id/clear" style="@style/FormButton" android:text="@string/clear"/>
+        <TextView style="@style/Caption" android:text="@string/privacy_note" android:layout_marginTop="24dp"/>
+        <Button android:id="@+id/help" style="@style/FormButton" android:text="@string/help" android:layout_marginBottom="12dp"/>
+    </LinearLayout>
+</ScrollView>

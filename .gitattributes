@@ -1,0 +1,10 @@
+* text=auto
+gradlew text eol=lf
+*.bat text eol=crlf
+*.jar binary
+
+# Preserve empty final columns in tab-separated language fixtures.
+*.tsv whitespace=-blank-at-eol
+
+# Preserve third-party source formatting verbatim.
+third_party/whisper.cpp/** -whitespace

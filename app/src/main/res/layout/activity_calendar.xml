@@ -1,0 +1,39 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/calendar_scroll" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:fillViewport="true">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:orientation="vertical" android:padding="16dp">
+        <TextView style="@style/Body" android:text="@string/app_name" android:textStyle="bold"
+            android:textSize="23sp" android:minHeight="44dp" android:gravity="center_vertical"
+            android:drawableStart="@drawable/app_brand_icon" android:drawablePadding="12dp" />
+        <TextView style="@style/Caption" android:text="@string/local_calendar_intro"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp" />
+        <Button android:id="@+id/calendar_add" style="@style/PrimaryButton" android:text="@string/calendar_add" />
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="16dp">
+            <Button android:id="@+id/month_previous" android:layout_width="48dp" android:layout_height="56dp"
+                android:text="@string/previous_symbol" android:textSize="28sp" android:padding="0dp"
+                android:textColor="@color/ink" android:background="@drawable/button_secondary"
+                android:contentDescription="@string/month_previous" />
+            <TextView android:id="@+id/month_title" style="@style/Body" android:layout_width="0dp"
+                android:layout_weight="1" android:gravity="center" android:textSize="22sp"
+                android:textStyle="bold" />
+            <Button android:id="@+id/month_next" android:layout_width="48dp" android:layout_height="56dp"
+                android:text="@string/next_symbol" android:textSize="28sp" android:padding="0dp"
+                android:textColor="@color/ink" android:background="@drawable/button_secondary"
+                android:contentDescription="@string/month_next" />
+        </LinearLayout>
+        <Button android:id="@+id/calendar_today" style="@style/FormButton" android:text="@string/calendar_today" />
+        <LinearLayout android:id="@+id/calendar_grid" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginTop="12dp" />
+        <TextView android:id="@+id/calendar_day_title" style="@style/Body" android:textSize="20sp"
+            android:textStyle="bold" android:layout_marginTop="20dp" />
+        <TextView android:id="@+id/calendar_message" style="@style/Caption"
+            android:layout_marginTop="8dp" android:accessibilityLiveRegion="polite" />
+        <LinearLayout android:id="@+id/calendar_events" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" />
+        <Button android:id="@+id/calendar_reminder_settings" style="@style/FormButton" android:text="@string/reminder_settings" />
+        <TextView style="@style/Caption" android:text="@string/local_storage_note"
+            android:layout_marginTop="20dp" android:layout_marginBottom="16dp" />
+    </LinearLayout>
+</ScrollView>
