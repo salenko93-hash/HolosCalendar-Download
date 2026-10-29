@@ -1,0 +1,4 @@
+<resources>
+    <item name="reminder_test" type="id" />
+    <item name="reminder_custom_minutes" type="id" />
+</resources>

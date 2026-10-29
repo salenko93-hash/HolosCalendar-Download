@@ -1,0 +1,20 @@
+.gradle/
+.idea/
+*.iml
+local.properties
+build/
+app/build/
+.DS_Store
+*.jks
+*.keystore
+HolosCalendar-project.zip
+
+# Python PDF generator
+__pycache__/
+*.py[cod]
+
+# Native builds and downloaded speech weights
+.cxx/
+.externalNativeBuild/
+ggml-*.bin
+*.part

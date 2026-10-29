@@ -1,0 +1,26 @@
+pluginManagement {
+    repositories {
+        google()
+        // Both endpoints belong to Maven Central. Opt in when the primary host is inaccessible.
+        if (providers.gradleProperty('useAlternateMavenCentral').getOrElse('false').toBoolean()) {
+            maven { name = 'MavenCentralAlternate'; url = uri('https://repo1.maven.org/maven2') }
+        } else {
+            mavenCentral()
+        }
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        if (providers.gradleProperty('useAlternateMavenCentral').getOrElse('false').toBoolean()) {
+            maven { name = 'MavenCentralAlternate'; url = uri('https://repo1.maven.org/maven2') }
+        } else {
+            mavenCentral()
+        }
+    }
+}
+rootProject.name = 'HolosCalendar'
+include ':app'
