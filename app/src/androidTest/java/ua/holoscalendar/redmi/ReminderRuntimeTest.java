@@ -34,6 +34,7 @@ public class ReminderRuntimeTest {
         ReminderScheduler.refresh(context).get(20,TimeUnit.SECONDS);
     }
     @After public void cleanup() throws Exception {
+        notifications.cancel("test",0);
         try (EventStore store = new EventStore(context)) {
             for (long id : created) { store.delete(id); ReminderScheduler.cancelNotification(context,id); }
         }
@@ -89,6 +90,50 @@ public class ReminderRuntimeTest {
         assertNotEquals(ReminderScheduler.notification(context,first).contentIntent,
                 ReminderScheduler.notification(context,second).contentIntent);
     }
+    @Test public void oneWakeUpDeliversEveryDueMeetingWithoutDuplicates() {
+        Instant start = Instant.now().plusSeconds(7200);
+        SavedEvent first = seed(start,10), second = seed(start,10);
+        SavedEvent future = seed(start.plusSeconds(3600),10);
+        Instant due = Instant.ofEpochMilli(ReminderPolicy.plannedAt(first)+1);
+        assertEquals(2,ReminderScheduler.deliverDue(context,due));
+        assertNotNull(awaitNotification(first.id,true));
+        assertNotNull(awaitNotification(second.id,true));
+        assertNull(active(future.id));
+        assertEquals(0,ReminderScheduler.deliverDue(context,due));
+    }
+    @Test public void testNotificationDoesNotConsumeAnEventReminder() {
+        SavedEvent event = seed(Instant.now().plusSeconds(7200),17);
+        assertTrue(ReminderAccess.postTest(context));
+        boolean found = false;
+        long until=SystemClock.uptimeMillis()+10_000;
+        while (!found && SystemClock.uptimeMillis()<until) {
+            for (StatusBarNotification posted : notifications.getActiveNotifications()) {
+                if ("test".equals(posted.getTag())) {
+                    found = true;
+                    assertEquals(context.getString(R.string.reminder_test_title),
+                            posted.getNotification().extras.getString(Notification.EXTRA_TITLE));
+                }
+            }
+            if (!found) SystemClock.sleep(100);
+        }
+        assertTrue(found);
+        try (EventStore store = new EventStore(context)) { assertNull(store.find(event.id).reminderDeliveredFor); }
+    }
+    @Test public void missedDailySeriesCatchesUpBothDueOccurrencesInOneWakeUp() {
+        ZoneId zone=ZoneOffset.UTC;
+        Instant start=Instant.parse("2026-11-05T12:00:00Z");
+        long id;
+        try (EventStore store=new EventStore(context)) {
+            id=store.save(0,new CalendarEvent("Серія "+UUID.randomUUID(),LocalDate.of(2026,11,5),
+                    LocalTime.NOON,null,zone,null,false,null,"D:1"),1440);
+            created.add(id);
+        }
+        assertEquals(2,ReminderScheduler.deliverDue(context,start.plusSeconds(60)));
+        try (EventStore store=new EventStore(context)) {
+            assertEquals(Long.valueOf(start.toEpochMilli()),store.find(id).reminderDeliveredFor);
+        }
+        assertEquals(0,ReminderScheduler.deliverDue(context,start.plusSeconds(60)));
+    }
     @Test public void tappingNotificationIntentOpensTheMatchingMeeting() throws Exception {
         SavedEvent event=seed(Instant.now().plusSeconds(7200),10);
         Instrumentation instrumentation=InstrumentationRegistry.getInstrumentation();
@@ -104,10 +149,12 @@ public class ReminderRuntimeTest {
     @Test public void realSystemAlarmDeliversWithoutAnOpenEditor() {
         // A timing assertion is meaningful only when the OS permits exact scheduling.
         Assume.assumeTrue(ReminderAccess.exactAllowed(context));
-        SavedEvent event=seed(Instant.now().plusSeconds(20),0);
+        Instant start=Instant.now().plusSeconds(20);
+        SavedEvent event=seed(start,0), simultaneous=seed(start,0);
         ReminderScheduler.scheduleNext(context,Instant.now());
         long until=SystemClock.uptimeMillis()+60_000;
         while (active(event.id)==null && SystemClock.uptimeMillis()<until) SystemClock.sleep(500);
         assertNotNull("AlarmManager must deliver to the manifest receiver",active(event.id));
+        assertNotNull("One alarm must deliver simultaneous reminders",awaitNotification(simultaneous.id,true));
     }
 }

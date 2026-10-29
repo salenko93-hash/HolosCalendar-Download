@@ -18,6 +18,9 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.LinearLayout;
+import android.text.InputType;
+import android.text.InputFilter;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -156,8 +159,37 @@ public final class EventEditorActivity extends Activity {
                 : !ReminderAccess.canNotify(this) ? R.string.reminder_blocked
                 : !ReminderAccess.exactAllowed(this) ? R.string.reminder_inexact : R.string.reminder_local_only);
         findViewById(R.id.reminder_settings).setVisibility(reminderMinutes != null ? View.VISIBLE : View.GONE);
+        updateReminderPreview();
         ((Button) findViewById(R.id.save_local)).setText(editingId == 0 ? R.string.save_local : recurrence.isEmpty()?R.string.update_local:R.string.update_series);
         ((TextView) findViewById(R.id.timezone)).setText(getString(R.string.timezone, eventZone.getId()));
+    }
+
+    private void updateReminderPreview() {
+        TextView preview = findViewById(R.id.reminder_preview);
+        preview.setVisibility(reminderMinutes == null ? View.GONE : View.VISIBLE);
+        if (reminderMinutes == null) return;
+        if (!datePresent || !timePresent) {
+            preview.setText(R.string.reminder_preview_missing); return;
+        }
+        try {
+            CalendarEvent draft = new CalendarEvent("Preview", selectedDate, selectedTime, durationMinutes,
+                    eventZone, relativeInstant, allDay, endDateExclusive, recurrence);
+            if (eventZone.getRules().getValidOffsets(selectedDate.atTime(selectedTime)).isEmpty()) {
+                preview.setText(R.string.dst_error); return;
+            }
+            SavedEvent master = new SavedEvent(0, draft.title, Instant.ofEpochMilli(draft.startMillis()), eventZone,
+                    durationMinutes, reminderMinutes, null, allDay, draft.endDateExclusive, recurrence,
+                    allDay ? selectedTime : null);
+            Instant now = Instant.now();
+            SavedEvent next = OccurrenceEngine.nextReminder(master, now);
+            if (next == null) { preview.setText(R.string.reminder_preview_expired); return; }
+            Instant at = Instant.ofEpochMilli(ReminderPolicy.plannedAt(next));
+            if (at.isBefore(now)) { preview.setText(R.string.reminder_preview_late); return; }
+            preview.setText(getString(R.string.reminder_preview,
+                    at.atZone(eventZone).format(DateTimeFormatter.ofPattern("d MMMM yyyy, HH:mm", UK)), eventZone.getId()));
+        } catch (IllegalArgumentException | IllegalStateException | DateTimeException invalid) {
+            preview.setText(R.string.reminder_preview_missing);
+        }
     }
 
     private void setStatus(String message, boolean error) {
@@ -239,18 +271,58 @@ public final class EventEditorActivity extends Activity {
                 }).setNegativeButton(R.string.cancel, null).show();
     }
 
-    private void pickReminder() {
+    AlertDialog pickReminder() {
         ArrayList<Integer> values = new ArrayList<>(); values.add(null);
         ArrayList<String> labels = new ArrayList<>(); labels.add(ReminderAccess.label(this, null));
         for (int value : new int[]{0, 5, 10, 15, 30, 60, 1440}) {
             values.add(value); labels.add(ReminderAccess.label(this, value));
         }
-        new AlertDialog.Builder(this).setTitle(R.string.reminder_title)
+        if (reminderMinutes != null && !values.contains(reminderMinutes)) {
+            values.add(reminderMinutes); labels.add(ReminderAccess.label(this, reminderMinutes));
+        }
+        labels.add(getString(R.string.reminder_custom));
+        return new AlertDialog.Builder(this).setTitle(R.string.reminder_title)
                 .setSingleChoiceItems(labels.toArray(new String[0]), values.indexOf(reminderMinutes), (dialog, index) -> {
-                    reminderMinutes = values.get(index); dialog.dismiss();
-                    if (reminderMinutes != null) ReminderAccess.requestNotifications(this);
-                    refresh();
+                    dialog.dismiss();
+                    if (index == values.size()) pickCustomReminder();
+                    else selectReminder(values.get(index));
                 }).setNegativeButton(R.string.cancel, null).show();
+    }
+
+    private void selectReminder(Integer minutes) {
+        reminderMinutes = minutes;
+        if (minutes != null) ReminderAccess.requestNotifications(this);
+        refresh(); updateReadiness();
+    }
+
+    AlertDialog pickCustomReminder() {
+        LinearLayout form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+        int padding = (int) (24 * getResources().getDisplayMetrics().density);
+        form.setPadding(padding, 0, padding, 0);
+        TextView label = new TextView(this);
+        label.setText(R.string.reminder_custom_hint);
+        label.setLabelFor(R.id.reminder_custom_minutes);
+        EditText input = new EditText(this);
+        input.setId(R.id.reminder_custom_minutes);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER);
+        input.setSingleLine(true);
+        input.setImportantForAutofill(View.IMPORTANT_FOR_AUTOFILL_NO);
+        input.setFilters(new InputFilter[]{new InputFilter.LengthFilter(5)});
+        input.setText(String.format(Locale.ROOT, "%d", reminderMinutes == null ? 15 : reminderMinutes));
+        input.selectAll();
+        form.addView(label); form.addView(input);
+        AlertDialog dialog = new AlertDialog.Builder(this).setTitle(R.string.reminder_custom_label).setView(form)
+                .setNegativeButton(R.string.cancel, null).setPositiveButton(android.R.string.ok, null).create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            try {
+                int minutes = Integer.parseInt(input.getText().toString().trim());
+                if (minutes < 0 || minutes > 1440) throw new NumberFormatException();
+                selectReminder(minutes); dialog.dismiss();
+            } catch (NumberFormatException invalid) { input.setError(getString(R.string.reminder_custom_error)); }
+        });
+        return dialog;
     }
 
     private void pickType() {

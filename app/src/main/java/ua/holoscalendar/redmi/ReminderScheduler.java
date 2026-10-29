@@ -15,6 +15,7 @@ import android.util.Log;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -36,14 +37,32 @@ final class ReminderScheduler {
         Context app = context.getApplicationContext();
         WORKER.execute(() -> {
             try {
-                if (ACTION.equals(intent.getAction())) deliver(app, intent.getLongExtra(EventEditorActivity.EVENT_ID, 0),
-                        intent.getLongExtra(EXPECTED_TIME, Long.MIN_VALUE), Instant.now());
+                // Drain the queue, including on boot/update/clock change. Scheduling a separate
+                // allow-while-idle alarm for each due event can hit Android's per-app idle quota.
+                deliverDue(app, Instant.now());
             } catch (SQLiteException | IllegalArgumentException | IllegalStateException | DateTimeException error) {
                 Log.e("HolosReminders", "Could not deliver a reminder", error);
             } finally {
                 try { safelySchedule(app); } finally { finished.run(); }
             }
         });
+    }
+
+    static int deliverDue(Context context, Instant now) {
+        int delivered = 0;
+        while (true) {
+            List<SavedEvent> due;
+            try (EventStore store = new EventStore(context)) { due = store.dueReminders(now); }
+            int progress = 0;
+            for (SavedEvent event : due) {
+                // Re-read/claim each event: an edit or deletion after the snapshot must win.
+                if (deliver(context, event.id, ReminderPolicy.plannedAt(event), now)) progress++;
+            }
+            delivered += progress;
+            // A daily series with a 24h offset can have two due occurrences after a
+            // missed wake-up. Drain its next occurrence too; stop on permission failure.
+            if (progress == 0) return delivered;
+        }
     }
 
     private static void safelySchedule(Context context) {

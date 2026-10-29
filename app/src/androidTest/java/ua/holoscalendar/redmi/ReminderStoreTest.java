@@ -100,4 +100,24 @@ public class ReminderStoreTest {
             assertEquals(future,store.nextReminder(Instant.parse("2026-11-05T09:06:00Z")).id);
         }
     }
+    @Test public void dueSnapshotIncludesOnlyPendingRemindersAndSurvivesReopening() {
+        long first,second,planned;
+        Instant now=Instant.parse("2026-11-05T11:50:00Z");
+        try (EventStore store = new EventStore(context,DATABASE)) {
+            first=store.save(0,event("Перша",12),10);
+            second=store.save(0,event("Друга",12),17);
+            store.save(0,event("Пізніше",13),0);
+            store.save(0,event("Без нагадування",12),null);
+            store.save(0,event("Застаріла",9),0);
+            planned=ReminderPolicy.plannedAt(store.find(second));
+            assertEquals(2,store.dueReminders(now).size());
+            assertEquals(second,store.dueReminders(now).get(0).id);
+            assertNotNull(store.claimReminder(second,planned,now));
+        }
+        try (EventStore store = new EventStore(context,DATABASE)) {
+            assertEquals(1,store.dueReminders(now).size());
+            assertEquals(first,store.dueReminders(now).get(0).id);
+            assertEquals(Integer.valueOf(17),store.find(second).reminderMinutes);
+        }
+    }
 }

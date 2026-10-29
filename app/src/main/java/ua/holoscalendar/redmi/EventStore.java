@@ -113,6 +113,20 @@ final class EventStore extends SQLiteOpenHelper {
         return best;
     }
 
+    /** Snapshot every due event so one wake-up can deliver simultaneous reminders. */
+    List<SavedEvent> dueReminders(Instant now) {
+        List<SavedEvent> due = new ArrayList<>();
+        try (Cursor cursor = getReadableDatabase().query("events", null,
+                "reminder_minutes IS NOT NULL", null, null, null, null)) {
+            while (cursor.moveToNext()) {
+                SavedEvent next = OccurrenceEngine.nextReminder(read(cursor), now);
+                if (next != null && ReminderPolicy.plannedAt(next) <= now.toEpochMilli()) due.add(next);
+            }
+        }
+        due.sort(java.util.Comparator.comparingLong(ReminderPolicy::plannedAt).thenComparingLong(event -> event.id));
+        return due;
+    }
+
     /** Atomically claim a still-current reminder so reboot or duplicate broadcasts cannot repeat it. */
     SavedEvent claimReminder(long id, long expectedTime, Instant now) {
         SQLiteDatabase db = getWritableDatabase();

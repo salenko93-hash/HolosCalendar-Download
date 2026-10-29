@@ -30,6 +30,7 @@
             <Button android:id="@+id/time" style="@style/FormButton" android:text="@string/choose_time"/>
             <Button android:id="@+id/duration" style="@style/FormButton"/>
             <Button android:id="@+id/reminder" style="@style/FormButton" android:text="@string/reminder_off"/>
+            <TextView android:id="@+id/reminder_preview" style="@style/Body" android:layout_marginTop="8dp" android:visibility="gone" android:accessibilityLiveRegion="polite"/>
             <TextView android:id="@+id/reminder_hint" style="@style/Caption" android:layout_marginTop="8dp" android:text="@string/reminder_local_only"/>
             <Button android:id="@+id/reminder_settings" style="@style/FormButton" android:text="@string/reminder_settings" android:visibility="gone"/>
             <TextView android:id="@+id/timezone" style="@style/Caption" android:layout_marginTop="12dp"/>

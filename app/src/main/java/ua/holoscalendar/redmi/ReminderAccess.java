@@ -1,11 +1,14 @@
 package ua.holoscalendar.redmi;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +16,8 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
+import android.widget.Button;
+import android.widget.Toast;
 
 final class ReminderAccess {
     static final int NOTIFICATION_PERMISSION = 101;
@@ -55,6 +60,14 @@ final class ReminderAccess {
                 : exact ? R.string.reminder_permissions_ready : R.string.reminder_inexact);
         AlertDialog.Builder dialog = new AlertDialog.Builder(activity).setTitle(R.string.reminder_settings)
                 .setMessage(message).setNegativeButton(R.string.cancel, null);
+        Button test = new Button(activity);
+        test.setId(R.id.reminder_test);
+        test.setText(R.string.reminder_test);
+        test.setAllCaps(false);
+        test.setOnClickListener(v -> Toast.makeText(activity,
+                postTest(activity) ? R.string.reminder_test_sent : R.string.reminder_blocked,
+                Toast.LENGTH_LONG).show());
+        dialog.setView(test);
         dialog.setPositiveButton(notify ? R.string.reminder_android_settings : R.string.reminder_enable, (d, w) -> {
             if (Build.VERSION.SDK_INT >= 33 && activity.checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS)
                     != PackageManager.PERMISSION_GRANTED
@@ -67,6 +80,23 @@ final class ReminderAccess {
                 (d, w) -> open(activity, new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM,
                         Uri.parse("package:" + activity.getPackageName()))));
         dialog.show();
+    }
+
+    @SuppressLint("MissingPermission") // Permission/channel state is checked and revocation is caught.
+    static boolean postTest(Context context) {
+        ensureChannel(context);
+        if (!canNotify(context)) return false;
+        PendingIntent open = PendingIntent.getActivity(context, 700,
+                new Intent(context, CalendarActivity.class),
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+        Notification notification = new Notification.Builder(context, CHANNEL)
+                .setSmallIcon(R.drawable.ic_notification).setContentTitle(context.getString(R.string.reminder_test_title))
+                .setContentText(context.getString(R.string.reminder_test_body)).setContentIntent(open)
+                .setAutoCancel(true).setTimeoutAfter(60_000).build();
+        try {
+            context.getSystemService(NotificationManager.class).notify("test", 0, notification);
+            return true;
+        } catch (SecurityException revoked) { return false; }
     }
 
     private static void open(Activity activity, Intent intent) {
